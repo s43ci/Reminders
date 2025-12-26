@@ -1,71 +1,88 @@
+/* --- المتغيرات والأساسيات --- */
 :root {
-    --bg-black: #000000;
-    --card-bg: rgba(28, 28, 30, 0.7);
-    --accent-blue: #0A84FF;
+    --bg-black: #000000; /* أسود حقيقي لشاشات OLED */
+    --card-bg: rgba(28, 28, 30, 0.7); /* رمادي داكن شفاف */
+    --accent-blue: #0A84FF; /* لون آبل الأزرق الشهير */
+    --accent-red: #FF453A; /* لون الحذف والتنبيه */
     --text-primary: #FFFFFF;
     --text-secondary: #8E8E93;
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --sheet-bg: #1C1C1E;
     --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ios-blur: blur(25px) saturate(180%);
 }
 
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* إزالة الوميض الأزرق عند اللمس في iOS */
+    outline: none;
 }
 
 body {
     background-color: var(--bg-black);
     color: var(--text-primary);
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
     margin: 0;
+    direction: rtl;
     overflow-x: hidden;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
+    line-height: 1.5;
 }
 
+/* --- الحاوية الرئيسية --- */
 .app-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
+    margin: 0 auto;
     padding: 20px;
-    padding-bottom: 100px;
+    padding-bottom: 120px; /* مساحة لزر الإضافة */
+    min-height: 100vh;
 }
 
 header {
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin: 40px 10px 30px 0;
 }
 
 header h1 {
     font-size: 34px;
     font-weight: 600;
     margin: 0;
+    letter-spacing: -0.5px;
 }
 
 header p {
     color: var(--text-secondary);
     font-size: 17px;
+    margin-top: 5px;
 }
 
-/* بطاقات المهام */
+/* --- بطاقات المهام --- */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .task-card {
     background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: var(--ios-blur);
+    -webkit-backdrop-filter: var(--ios-blur);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: 18px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    transition: transform 0.3s var(--spring-easing);
-    animation: slideIn 0.5s ease-out;
+    transition: transform 0.3s var(--spring-easing), opacity 0.3s ease;
+    animation: taskAppear 0.5s var(--spring-easing);
 }
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes taskAppear {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.task-content {
+    flex: 1;
+    cursor: pointer;
 }
 
 .task-info h3 {
@@ -75,112 +92,210 @@ header p {
 }
 
 .task-info p {
-    margin: 5px 0 0;
-    font-size: 14px;
+    margin: 4px 0 0;
+    font-size: 13px;
     color: var(--accent-blue);
+    font-weight: 300;
 }
 
-/* زر الإضافة العائم */
+/* حالة الإتمام */
+.completed {
+    opacity: 0.5;
+}
+
+.completed h3 {
+    text-decoration: line-through;
+}
+
+/* زر الحذف */
+.delete-btn {
+    background: rgba(255, 69, 58, 0.1);
+    border: none;
+    color: var(--accent-red);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.delete-btn:active {
+    transform: scale(0.8);
+    background: var(--accent-red);
+    color: white;
+}
+
+/* --- زر الإضافة العائم (FAB) --- */
 .fab {
     position: fixed;
     bottom: 40px;
-    left: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 30px;
+    left: 30px; /* يسار لأننا RTL */
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
     background: var(--accent-blue);
     color: white;
     border: none;
-    box-shadow: 0 10px 30px rgba(10, 132, 255, 0.3);
+    box-shadow: 0 15px 35px rgba(10, 132, 255, 0.35);
     cursor: pointer;
-    z-index: 10;
+    z-index: 90;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.2s;
+    transition: 0.3s var(--spring-easing);
 }
 
-.fab:active { transform: scale(0.9); }
+.fab:active {
+    transform: scale(0.85) rotate(90deg);
+}
 
-/* Bottom Sheet */
+/* --- الـ Bottom Sheet --- */
+.overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s ease;
+    z-index: 100;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .bottom-sheet {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #1C1C1E;
+    bottom: 0; left: 0; right: 0;
+    background: var(--sheet-bg);
     border-radius: 30px 30px 0 0;
-    padding: 25px;
+    padding: 20px 25px 40px;
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 100;
+    z-index: 101;
     max-width: 600px;
-    margin: auto;
+    margin: 0 auto;
 }
 
-.bottom-sheet.active { transform: translateY(0); }
+.bottom-sheet.active {
+    transform: translateY(0);
+}
 
 .sheet-handle {
     width: 40px;
     height: 5px;
     background: #3A3A3C;
-    border-radius: 5px;
-    margin: 0 auto 20px;
+    border-radius: 10px;
+    margin: 0 auto 25px;
 }
 
-.overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s;
-    z-index: 90;
-}
-
-.overlay.active { opacity: 1; visibility: visible; }
-
-input[type="text"] {
-    width: 100%;
-    background: #2C2C2E;
-    border: none;
-    border-radius: 12px;
-    padding: 15px;
-    color: white;
-    font-size: 17px;
-    outline: none;
+.bottom-sheet h2 {
+    font-size: 22px;
     margin-bottom: 20px;
 }
 
-/* محاكاة عجلة الاختيار */
+/* --- المدخلات وأدوات التحكم --- */
+input[type="text"] {
+    width: 100%;
+    background: #2C2C2E;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 16px;
+    color: white;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+.setting-group {
+    margin-bottom: 25px;
+}
+
+.setting-group p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.segmented-control {
+    display: flex;
+    background: #2C2C2E;
+    border-radius: 12px;
+    padding: 2px;
+}
+
+.segmented-control label {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.segmented-control input:checked + label {
+    background: #636366;
+    color: white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.segmented-control input { display: none; }
+
+/* عجلة الوقت المبسطة */
+.time-picker-container {
+    margin-bottom: 30px;
+}
+
 .ios-wheel-picker {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     background: #2C2C2E;
-    border-radius: 15px;
-    padding: 10px;
+    border-radius: 16px;
+    padding: 15px;
+    font-size: 24px;
 }
 
 select {
     background: transparent;
-    color: white;
+    color: var(--accent-blue);
     border: none;
-    font-size: 20px;
-    appearance: none;
-    padding: 10px;
-    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
+/* زر الحفظ الرئيسي */
 .save-btn {
     width: 100%;
     background: var(--accent-blue);
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 15px;
+    border-radius: 16px;
+    padding: 18px;
     font-size: 18px;
     font-weight: 600;
-    margin-top: 25px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.save-btn:active {
+    transform: scale(0.96);
+    filter: brightness(1.1);
+}
+
+/* --- التحسينات للشاشات الصغيرة --- */
+@media (max-width: 380px) {
+    header h1 { font-size: 28px; }
+    .app-container { padding: 15px; }
+    .fab { width: 56px; height: 56px; left: 20px; bottom: 30px; }
 }
