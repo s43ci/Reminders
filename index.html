@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تذكر - ذكاء وأناقة</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>تذكر</h1>
+            <p id="current-date"></p>
+        </header>
+
+        <div id="task-list" class="task-list">
+            </div>
+
+        <button class="fab" id="open-sheet">
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+
+        <div class="overlay" id="overlay"></div>
+        <div class="bottom-sheet" id="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h2>مهمة جديدة</h2>
+            <input type="text" id="task-input" placeholder="ماذا تريد أن تنجز؟" autocomplete="off">
+            
+            <div class="time-picker-container">
+                <p>وقت التذكير اليومي:</p>
+                <div class="ios-wheel-picker">
+                    <select id="hour-picker"></select>
+                    <span>:</span>
+                    <select id="minute-picker"></select>
+                </div>
+            </div>
+
+            <button class="save-btn" id="add-task">إضافة إلى القائمة</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+</body>
+</html>
