@@ -1,301 +1,165 @@
-/* --- المتغيرات والأساسيات --- */
 :root {
-    --bg-black: #000000; /* أسود حقيقي لشاشات OLED */
-    --card-bg: rgba(28, 28, 30, 0.7); /* رمادي داكن شفاف */
-    --accent-blue: #0A84FF; /* لون آبل الأزرق الشهير */
-    --accent-red: #FF453A; /* لون الحذف والتنبيه */
-    --text-primary: #FFFFFF;
-    --text-secondary: #8E8E93;
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --sheet-bg: #1C1C1E;
-    --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    --ios-blur: blur(25px) saturate(180%);
+    --bg-color: #0a0a0a;
+    --card-bg: rgba(28, 28, 30, 0.7);
+    --accent-color: #ffffff;
+    --text-main: #ffffff;
+    --text-secondary: #8e8e93;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --font-family: 'IBM Plex Sans Arabic', sans-serif;
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
 }
 
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* إزالة الوميض الأزرق عند اللمس في iOS */
-    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: var(--bg-black);
-    color: var(--text-primary);
-    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-family);
     margin: 0;
-    direction: rtl;
+    padding: 0;
     overflow-x: hidden;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
-/* --- الحاوية الرئيسية --- */
 .app-container {
-    width: 100%;
-    max-width: 480px;
+    padding: 40px 20px 120px 20px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 120px; /* مساحة لزر الإضافة */
-    min-height: 100vh;
-}
-
-header {
-    margin: 40px 10px 30px 0;
 }
 
 header h1 {
     font-size: 34px;
     font-weight: 600;
-    margin: 0;
-    letter-spacing: -0.5px;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
 }
 
 header p {
     color: var(--text-secondary);
-    font-size: 17px;
-    margin-top: 5px;
+    font-size: 14px;
+    margin-bottom: 30px;
 }
 
-/* --- بطاقات المهام --- */
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* بطاقات المهام */
 .task-card {
     background: var(--card-bg);
-    backdrop-filter: var(--ios-blur);
-    -webkit-backdrop-filter: var(--ios-blur);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 18px;
-    display: flex;
-    align-items: center;
-    transition: transform 0.3s var(--spring-easing), opacity 0.3s ease;
-    animation: taskAppear 0.5s var(--spring-easing);
+    margin-bottom: 15px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    animation: slideUp 0.5s ease forwards;
 }
 
-@keyframes taskAppear {
-    from { opacity: 0; transform: scale(0.9) translateY(20px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.task-content {
-    flex: 1;
-    cursor: pointer;
-}
-
-.task-info h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 400;
-}
-
-.task-info p {
-    margin: 4px 0 0;
-    font-size: 13px;
-    color: var(--accent-blue);
-    font-weight: 300;
-}
-
-/* حالة الإتمام */
-.completed {
+.task-card.completed {
     opacity: 0.5;
 }
 
-.completed h3 {
+.task-card.completed .task-title {
     text-decoration: line-through;
 }
 
-/* زر الحذف */
-.delete-btn {
-    background: rgba(255, 69, 58, 0.1);
-    border: none;
-    color: var(--accent-red);
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+.task-header {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 15px;
-    cursor: pointer;
-    transition: 0.2s;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
-.delete-btn:active {
-    transform: scale(0.8);
-    background: var(--accent-red);
-    color: white;
+.task-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-/* --- زر الإضافة العائم (FAB) --- */
+.task-note {
+    color: var(--text-secondary);
+    font-size: 14px;
+    white-space: pre-wrap; /* لدعم تعدد الأسطر */
+    word-break: break-word;
+}
+
+/* الأزرار العائمة */
 .fab {
     position: fixed;
-    bottom: 40px;
-    left: 30px; /* يسار لأننا RTL */
-    width: 64px;
-    height: 64px;
+    bottom: calc(30px + var(--safe-area-inset-bottom));
+    left: 30px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    background: var(--accent-blue);
-    color: white;
+    background: var(--accent-color);
+    color: #000;
     border: none;
-    box-shadow: 0 15px 35px rgba(10, 132, 255, 0.35);
-    cursor: pointer;
-    z-index: 90;
+    box-shadow: 0 10px 30px rgba(255,255,255,0.1);
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: 0.3s var(--spring-easing);
-}
-
-.fab:active {
-    transform: scale(0.85) rotate(90deg);
-}
-
-/* --- الـ Bottom Sheet --- */
-.overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s ease;
+    cursor: pointer;
     z-index: 100;
 }
 
-.overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
+/* Bottom Sheet */
 .bottom-sheet {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--sheet-bg);
-    border-radius: 30px 30px 0 0;
-    padding: 20px 25px 40px;
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 101;
-    max-width: 600px;
-    margin: 0 auto;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background: #1c1c1e;
+    border-radius: 25px 25px 0 0;
+    padding: 20px;
+    transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1000;
 }
 
 .bottom-sheet.active {
-    transform: translateY(0);
+    bottom: 0;
+}
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    z-index: 999;
+    backdrop-filter: blur(4px);
 }
 
 .sheet-handle {
     width: 40px;
     height: 5px;
-    background: #3A3A3C;
+    background: #3a3a3c;
     border-radius: 10px;
-    margin: 0 auto 25px;
+    margin: 0 auto 20px auto;
 }
 
-.bottom-sheet h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
-/* --- المدخلات وأدوات التحكم --- */
-input[type="text"] {
+input, textarea {
     width: 100%;
-    background: #2C2C2E;
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    padding: 16px;
-    color: white;
-    font-size: 17px;
-    margin-bottom: 20px;
-}
-
-.setting-group {
-    margin-bottom: 25px;
-}
-
-.setting-group p {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-.segmented-control {
-    display: flex;
-    background: #2C2C2E;
+    background: #2c2c2e;
+    border: none;
     border-radius: 12px;
-    padding: 2px;
-}
-
-.segmented-control label {
-    flex: 1;
-    padding: 10px;
-    text-align: center;
-    font-size: 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.segmented-control input:checked + label {
-    background: #636366;
     color: white;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-}
-
-.segmented-control input { display: none; }
-
-/* عجلة الوقت المبسطة */
-.time-picker-container {
-    margin-bottom: 30px;
-}
-
-.ios-wheel-picker {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    background: #2C2C2E;
-    border-radius: 16px;
     padding: 15px;
-    font-size: 24px;
+    font-family: var(--font-family);
+    margin-bottom: 15px;
+    font-size: 16px;
 }
 
-select {
-    background: transparent;
-    color: var(--accent-blue);
+.primary-btn {
+    background: var(--accent-color);
+    color: black;
     border: none;
-    font-size: 24px;
+    padding: 12px 25px;
+    border-radius: 12px;
     font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* زر الحفظ الرئيسي */
-.save-btn {
     width: 100%;
-    background: var(--accent-blue);
-    color: white;
-    border: none;
-    border-radius: 16px;
-    padding: 18px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
+    font-family: var(--font-family);
 }
 
-.save-btn:active {
-    transform: scale(0.96);
-    filter: brightness(1.1);
-}
-
-/* --- التحسينات للشاشات الصغيرة --- */
-@media (max-width: 380px) {
-    header h1 { font-size: 28px; }
-    .app-container { padding: 15px; }
-    .fab { width: 56px; height: 56px; left: 20px; bottom: 30px; }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
