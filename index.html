@@ -1,57 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تذكّر - واثق</title>
-    <link rel="stylesheet" href="style.css">
+    <title>مهمات | فخامة البساطة</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 
     <div class="app-container">
         <header>
-            <h1>تذكّر - واثق</h1>
-            <p id="current-date"></p>
+            <h1>مهمات</h1>
+            <p id="date-display"></p>
         </header>
 
-        <div id="task-list" class="task-list"></div>
+        <main id="task-list">
+            </main>
 
-        <button class="fab" id="open-sheet">
-            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <button class="fab" id="open-sheet-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
+    </div>
 
-        <div class="overlay" id="overlay"></div>
-        <div class="bottom-sheet" id="bottom-sheet">
-            <div class="sheet-handle"></div>
-            <h2>مهمة جديدة</h2>
-            <input type="text" id="task-input" placeholder="ماذا تريد أن تنجز؟" autocomplete="off">
-            
-            <div class="setting-group">
-                <p>نوع التذكير:</p>
-                <div class="segmented-control">
-                    <input type="radio" id="once" name="frequency" value="once" checked>
-                    <label for="once">مرة واحدة</label>
-                    <input type="radio" id="daily" name="frequency" value="daily">
-                    <label for="daily">يوميًا</label>
-                </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-content">
+            <h2 id="sheet-title">مهمة جديدة</h2>
+            <input type="text" id="task-input" placeholder="عنوان المهمة..." autocomplete="off">
+            <textarea id="note-input" placeholder="ملاحظات وتفاصيل..." rows="4"></textarea>
+            <div class="sheet-actions">
+                <button id="save-task-btn" class="primary-btn">حفظ</button>
+                <button id="close-sheet-btn" class="secondary-btn">إلغاء</button>
             </div>
-
-            <div class="time-picker-container">
-                <p>وقت التذكير:</p>
-                <div class="ios-wheel-picker">
-                    <select id="hour-picker"></select>
-                    <span>:</span>
-                    <select id="minute-picker"></select>
-                </div>
-            </div>
-
-            <button class="save-btn" id="add-task">إضافة المهمة</button>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
 </body>
 </html>
+
