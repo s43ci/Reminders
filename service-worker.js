@@ -1,5 +1,5 @@
-const CACHE_NAME = 'tazakar-v1';
-const ASSETS = [
+const CACHE_NAME = 'mohamat-v1';
+const assets = [
   './',
   './index.html',
   './style.css',
@@ -8,7 +8,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
 });
 
 self.addEventListener('fetch', e => {
