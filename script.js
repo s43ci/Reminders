@@ -1,139 +1,104 @@
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let currentEditingId = null;
+
+// عناصر الواجهة
 const taskList = document.getElementById('task-list');
-const taskInput = document.getElementById('task-input');
-const addBtn = document.getElementById('add-task');
-const openSheet = document.getElementById('open-sheet');
 const bottomSheet = document.getElementById('bottom-sheet');
 const overlay = document.getElementById('overlay');
-const hourPicker = document.getElementById('hour-picker');
-const minPicker = document.getElementById('minute-picker');
+const taskInput = document.getElementById('task-input');
+const noteInput = document.getElementById('note-input');
+const dateDisplay = document.getElementById('date-display');
 
-let tasks = JSON.parse(localStorage.getItem('tasks_wathiq')) || [];
+// عرض التاريخ
+const options = { weekday: 'long', day: 'numeric', month: 'long' };
+dateDisplay.innerText = new Date().toLocaleDateString('ar-SA', options);
 
-function setupPickers() {
-    for(let i=0; i<24; i++) hourPicker.innerHTML += `<option value="${i}">${i.toString().padStart(2, '0')}</option>`;
-    for(let i=0; i<60; i+=5) minPicker.innerHTML += `<option value="${i}">${i.toString().padStart(2, '0')}</option>`;
+function saveToLocal() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-document.getElementById('current-date').innerText = new Intl.DateTimeFormat('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
-
-openSheet.addEventListener('click', () => {
-    bottomSheet.classList.add('active');
-    overlay.classList.add('active');
-});
-
-overlay.addEventListener('click', () => {
-    bottomSheet.classList.remove('active');
-    overlay.classList.remove('active');
-});
-
-// إضافة مهمة مع خيار التكرار
-addBtn.addEventListener('click', () => {
-    if (taskInput.value.trim() === "") return;
-
-    const freq = document.querySelector('input[name="frequency"]:checked').value;
-
-    const task = {
-        id: Date.now(),
-        text: taskInput.value,
-        time: `${hourPicker.value.padStart(2, '0')}:${minPicker.value.padStart(2, '0')}`,
-        frequency: freq, // 'once' or 'daily'
-        completed: false,
-        notifiedToday: false
-    };
-
-    tasks.push(task);
-    saveAndRender();
-    
-    taskInput.value = "";
-    bottomSheet.classList.remove('active');
-    overlay.classList.remove('active');
-    if (navigator.vibrate) navigator.vibrate(20);
-});
-
 function renderTasks() {
-    taskList.innerHTML = "";
+    taskList.innerHTML = '';
     tasks.forEach(task => {
-        const div = document.createElement('div');
-        div.className = `task-card ${task.completed ? 'completed' : ''}`;
-        div.innerHTML = `
-            <button class="delete-btn" onclick="deleteTask(${task.id})">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-            <div class="task-content" onclick="toggleTask(${task.id})">
-                <div class="task-info">
-                    <h3>${task.text}</h3>
-                    <p>${task.frequency === 'daily' ? 'يوميًا الساعة' : 'مرة واحدة الساعة'} ${task.time}</p>
+        const card = document.createElement('div');
+        card.className = `task-card ${task.completed ? 'completed' : ''}`;
+        card.innerHTML = `
+            <div class="task-header" onclick="toggleTask('${task.id}')">
+                <div style="flex: 1;">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-note">${task.note}</div>
                 </div>
+                <div class="task-status">${task.completed ? '✔' : ''}</div>
             </div>
-            <div class="task-action" onclick="toggleTask(${task.id})">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${task.completed ? '#34C759' : '#3A3A3C'}" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    ${task.completed ? '<path d="M9 12l2 2 4-4"></path>' : ''}
-                </svg>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button onclick="editTask('${task.id}')" style="background:none; border:none; color:#0a84ff; font-family:inherit; cursor:pointer;">تعديل</button>
+                <button onclick="deleteTask('${task.id}')" style="background:none; border:none; color:#ff453a; font-family:inherit; cursor:pointer;">حذف</button>
             </div>
         `;
-        taskList.appendChild(div);
+        taskList.appendChild(card);
     });
 }
 
-function deleteTask(id) {
-    if(confirm('هل تريد حذف هذا التذكير؟')) {
-        tasks = tasks.filter(t => t.id !== id);
-        saveAndRender();
+function openSheet(isEdit = false) {
+    bottomSheet.classList.add('active');
+    overlay.style.display = 'block';
+    if (!isEdit) {
+        document.getElementById('sheet-title').innerText = 'مهمة جديدة';
+        taskInput.value = '';
+        noteInput.value = '';
+        currentEditingId = null;
     }
 }
+
+function closeSheet() {
+    bottomSheet.classList.remove('active');
+    overlay.style.display = 'none';
+}
+
+document.getElementById('save-task-btn').addEventListener('click', () => {
+    if (!taskInput.value.trim()) return;
+
+    if (currentEditingId) {
+        const task = tasks.find(t => t.id === currentEditingId);
+        task.title = taskInput.value;
+        task.note = noteInput.value;
+    } else {
+        tasks.push({
+            id: Date.now().toString(),
+            title: taskInput.value,
+            note: noteInput.value,
+            completed: false
+        });
+    }
+    
+    saveToLocal();
+    renderTasks();
+    closeSheet();
+});
 
 function toggleTask(id) {
     tasks = tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
-    if (navigator.vibrate) navigator.vibrate(50);
-    saveAndRender();
-}
-
-function saveAndRender() {
-    localStorage.setItem('tasks_wathiq', JSON.stringify(tasks));
+    saveToLocal();
     renderTasks();
 }
 
-// نظام الإشعارات المطور
-setInterval(() => {
-    const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    let changed = false;
-    tasks.forEach(task => {
-        if(task.time === currentTime && !task.completed && !task.notifiedToday) {
-            sendNotification(task.text);
-            task.notifiedToday = true;
-            
-            // إذا كانت "مرة واحدة"، نحذفها أو نحددها كمكتملة بعد الإشعار
-            if(task.frequency === 'once') {
-                task.completed = true;
-            }
-            changed = true;
-        }
-
-        // إعادة ضبط notifiedToday عند منتصف الليل
-        if(currentTime === "00:00") {
-            task.notifiedToday = false;
-            changed = true;
-        }
-    });
-
-    if(changed) saveAndRender();
-}, 60000);
-
-function sendNotification(title) {
-    if (Notification.permission === "granted") {
-        new Notification("تذكّر - واثق", {
-            body: title,
-            requireInteraction: true 
-        });
-        let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(() => {});
-    } else {
-        Notification.requestPermission();
-    }
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveToLocal();
+    renderTasks();
 }
 
-setupPickers();
+function editTask(id) {
+    const task = tasks.find(t => t.id === id);
+    currentEditingId = id;
+    taskInput.value = task.title;
+    noteInput.value = task.note;
+    document.getElementById('sheet-title').innerText = 'تعديل المهمة';
+    openSheet(true);
+}
+
+document.getElementById('open-sheet-btn').addEventListener('click', () => openSheet());
+document.getElementById('close-sheet-btn').addEventListener('click', closeSheet);
+overlay.addEventListener('click', closeSheet);
+
 renderTasks();
